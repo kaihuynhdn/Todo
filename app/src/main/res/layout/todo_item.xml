@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:padding="16dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/tv_title_todo_item"
+        android:text="Title"
+        android:textStyle="bold"
+        android:textColor="#312f2f"
+        android:textSize="16sp"
+        android:padding="3dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tv_date_todo_item"
+        android:text="22-12-2012"
+        android:textColor="#312f2f"
+        android:paddingLeft="5dp"
+        android:textSize="14sp"
+        android:typeface="sans"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
