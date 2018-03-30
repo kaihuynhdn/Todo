@@ -1,7 +1,10 @@
 package com.example.kaihuynh.todo;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -103,10 +106,24 @@ public class AddTodoActivity extends AppCompatActivity {
                 todo.setDate(mDate.getText().toString());
                 todo.setImage(img);
 
-                dbManager.addTodo(todo);
+                long id = dbManager.addTodo(todo);
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(mYear, mMonth-1, mDay, mHour, mMinute,0);
+                setAlarm(calendar.getTimeInMillis(), id, todo);
                 finish();
             }
         });
+    }
+
+    private void setAlarm(long timeinMillis, long id, Todo todo) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(AddTodoActivity.this, Alarm.class);
+        intent.putExtra("id", id);
+        intent.putExtra("todo", todo);
+        intent.putExtra("action", "notify");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(AddTodoActivity.this, (int) id, intent, 0);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeinMillis, pendingIntent);
     }
 
     private void showTimePickerDialog() {

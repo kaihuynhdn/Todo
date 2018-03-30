@@ -46,16 +46,18 @@ public class DBManager extends SQLiteOpenHelper {
         Log.d(TAG, "onUpgrade: ");
     }
 
-    public void addTodo(Todo todo) {
+    public long addTodo(Todo todo) {
+        long id = -1;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(TITLE, todo.getTitle());
         contentValues.put(CONTENT, todo.getContent());
         contentValues.put(TIME, todo.getDate());
         contentValues.put(IMG, todo.getImage());
-        db.insert(TABLE_NAME, null, contentValues);
+        id = db.insert(TABLE_NAME, null, contentValues);
         db.close();
         Log.d(TAG, "addTololist: Successfully!");
+        return id;
     }
 
     public ArrayList<Todo> getListData() {

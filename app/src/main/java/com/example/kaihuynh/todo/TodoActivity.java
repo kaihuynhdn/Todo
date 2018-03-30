@@ -1,8 +1,11 @@
 package com.example.kaihuynh.todo;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -244,6 +247,7 @@ public class TodoActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                cancelAlarm(currentTodo.getId());
                 dbManager.deleteTodo(currentTodo.getId());
                 finish();
             }
@@ -268,6 +272,10 @@ public class TodoActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 Todo td = new Todo(currentTodo.getId(), mTitle.getText().toString(), mContent.getText().toString(), mDate.getText().toString(), img);
                 dbManager.updateTodo(td);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(mYear, mMonth-1, mDay, mHour, mMinute,0);
+                cancelAlarm(td.getId());
+                setAlarm(calendar.getTimeInMillis(), td.getId(), td);
                 finish();
             }
         });
@@ -281,6 +289,27 @@ public class TodoActivity extends AppCompatActivity {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private void setAlarm(long timeinMillis, long id, Todo todo) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(TodoActivity.this, Alarm.class);
+        intent.putExtra("id", id);
+        intent.putExtra("todo", todo);
+        intent.putExtra("action", "notify");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, (int) id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeinMillis, pendingIntent);
+    }
+
+    private void cancelAlarm(int REQUEST_CODE)
+    {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent myIntent = new Intent(TodoActivity.this, Alarm.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                TodoActivity.this, REQUEST_CODE, myIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmManager.cancel(pendingIntent);
     }
 
     @Override
