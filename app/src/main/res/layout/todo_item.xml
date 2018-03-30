@@ -5,24 +5,47 @@
     android:padding="16dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:id="@+id/tv_title_todo_item"
-        android:text="Title"
-        android:textStyle="bold"
-        android:textColor="#312f2f"
-        android:textSize="16sp"
-        android:padding="3dp"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tv_date_todo_item"
-        android:text="22-12-2012"
-        android:textColor="#312f2f"
-        android:paddingLeft="5dp"
-        android:textSize="14sp"
-        android:typeface="sans"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <ImageView
+            android:layout_marginTop="5dp"
+            android:id="@+id/img_item"
+            android:scaleType="fitCenter"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_marginLeft="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_title_todo_item"
+                android:text="Title"
+                android:textStyle="bold"
+                android:textColor="#312f2f"
+                android:textSize="16sp"
+                android:padding="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_date_todo_item"
+                android:text="22-12-2012"
+                android:textColor="#312f2f"
+                android:paddingLeft="5dp"
+                android:textSize="14sp"
+                android:typeface="sans"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </LinearLayout>
+
 
 </LinearLayout>
