@@ -100,20 +100,42 @@ public class AddTodoActivity extends AppCompatActivity {
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Todo todo = new Todo();
-                todo.setTitle(mTitle.getText().toString());
-                todo.setContent(mContent.getText().toString());
-                todo.setDate(mDate.getText().toString());
-                todo.setImage(img);
+                if(isValid()){
+                    Todo todo = new Todo();
+                    todo.setTitle(mTitle.getText().toString());
+                    todo.setContent(mContent.getText().toString());
+                    todo.setDate(mDate.getText().toString());
+                    todo.setImage(img);
 
-                long id = dbManager.addTodo(todo);
+                    long id = dbManager.addTodo(todo);
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(mYear, mMonth-1, mDay, mHour, mMinute,0);
-                setAlarm(calendar.getTimeInMillis(), id, todo);
-                finish();
+                    Calendar calendar1 = Calendar.getInstance();
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(mYear, mMonth-1, mDay, mHour, mMinute,0);
+
+
+                    finish();
+                }
             }
         });
+    }
+
+    private boolean isValid(){
+        if(mTitle.getText().toString().equals("")){
+            Toast.makeText(AddTodoActivity.this, "Cần nhập đủ dữ liệu!", Toast.LENGTH_SHORT).show();
+            mTitle.requestFocus();
+            return false;
+        }else if(mContent.getText().toString().equals("")){
+            Toast.makeText(AddTodoActivity.this, "Cần nhập đủ dữ liệu!", Toast.LENGTH_SHORT).show();
+            mContent.requestFocus();
+            return false;
+        }else if(mDate.getText().toString().equals("")){
+            Toast.makeText(AddTodoActivity.this, "Cần nhập đủ dữ liệu!", Toast.LENGTH_SHORT).show();
+            mDate.requestFocus();
+            return false;
+        }
+        return true;
     }
 
     private void setAlarm(long timeinMillis, long id, Todo todo) {
@@ -201,9 +223,9 @@ public class AddTodoActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             try {
-                final Uri imageUri = data.getData();
-                final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                Uri imageUri = data.getData();
+                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
                 ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
                 selectedImage.compress(Bitmap.CompressFormat.PNG, 100, byteArr);
                 img = byteArr.toByteArray();

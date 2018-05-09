@@ -185,10 +185,17 @@ public class TodoActivity extends AppCompatActivity {
         mUpdateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Todo td = new Todo(currentTodo.getId(), mTitle.getText().toString(), mContent.getText().toString(), mDate.getText().toString(), img);
-                dbManager.updateTodo(td);
-                Toast.makeText(TodoActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
-                mUpdateButton.setVisibility(View.INVISIBLE);
+                if(isValid()){
+                    Todo td = new Todo(currentTodo.getId(), mTitle.getText().toString(), mContent.getText().toString(), mDate.getText().toString(), img);
+                    dbManager.updateTodo(td);
+                    mUpdateButton.setVisibility(View.INVISIBLE);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(mYear, mMonth-1, mDay, mHour, mMinute,0);
+                    updateAlarm(calendar.getTimeInMillis(), td);
+                    Toast.makeText(TodoActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+
+                    finish();
+                }
             }
         });
     }
@@ -270,13 +277,15 @@ public class TodoActivity extends AppCompatActivity {
         builder.setPositiveButton("Cập nhật", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Todo td = new Todo(currentTodo.getId(), mTitle.getText().toString(), mContent.getText().toString(), mDate.getText().toString(), img);
-                dbManager.updateTodo(td);
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(mYear, mMonth-1, mDay, mHour, mMinute,0);
-                cancelAlarm(td.getId());
-                setAlarm(calendar.getTimeInMillis(), td.getId(), td);
-                finish();
+                if(isValid()){
+                    Todo td = new Todo(currentTodo.getId(), mTitle.getText().toString(), mContent.getText().toString(), mDate.getText().toString(), img);
+                    dbManager.updateTodo(td);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(mYear, mMonth-1, mDay, mHour, mMinute,0);
+                    Toast.makeText(TodoActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                    updateAlarm(calendar.getTimeInMillis(), td);
+                    finish();
+                }
             }
         });
         builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
@@ -291,6 +300,23 @@ public class TodoActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    private boolean isValid(){
+        if(mTitle.getText().toString().equals("")){
+            Toast.makeText(TodoActivity.this, "Cần nhập đủ dữ liệu!", Toast.LENGTH_SHORT).show();
+            mTitle.requestFocus();
+            return false;
+        }else if(mContent.getText().toString().equals("")){
+            Toast.makeText(TodoActivity.this, "Cần nhập đủ dữ liệu!", Toast.LENGTH_SHORT).show();
+            mContent.requestFocus();
+            return false;
+        }else if(mDate.getText().toString().equals("")){
+            Toast.makeText(TodoActivity.this, "Cần nhập đủ dữ liệu!", Toast.LENGTH_SHORT).show();
+            mDate.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
     private void setAlarm(long timeinMillis, long id, Todo todo) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(TodoActivity.this, Alarm.class);
@@ -301,15 +327,30 @@ public class TodoActivity extends AppCompatActivity {
         alarmManager.set(AlarmManager.RTC_WAKEUP, timeinMillis, pendingIntent);
     }
 
+    private void updateAlarm(long timeinMillis, Todo t){
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent myIntent = new Intent(TodoActivity.this, Alarm.class);
+        myIntent.putExtra("id", t.getId());
+        myIntent.putExtra("todo", t);
+        myIntent.putExtra("action", "cancle");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, t.getId(), myIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.cancel(pendingIntent);
+        pendingIntent.cancel();
+        Intent intent = new Intent(TodoActivity.this, Alarm.class);
+        intent.putExtra("id", t.getId());
+        intent.putExtra("todo", t);
+        intent.putExtra("action", "notify");
+        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(TodoActivity.this, t.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeinMillis, pendingIntent1);
+    }
+
     private void cancelAlarm(int REQUEST_CODE)
     {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent myIntent = new Intent(TodoActivity.this, Alarm.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                TodoActivity.this, REQUEST_CODE, myIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, REQUEST_CODE, myIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
+
     }
 
     @Override
